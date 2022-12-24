@@ -71,13 +71,15 @@ def get_weighted_rarities(arr):
 def generate_single_image(filepaths, output_filename=None):
 
     # Treat the first layer as the background
-    bg = Image.open(os.path.join("assets", filepaths[0]))
+    bg = Image.open(os.path.join("assets", filepaths[0])).convert('RGBA')
 
     # Loop through layers 1 to n and stack them on top of another
     for filepath in filepaths[1:]:
         if filepath.endswith(".png"):
-            img = Image.open(os.path.join("assets", filepath))
-            bg.paste(img, (0, 0), img)
+            img_clear = Image.new("RGBA", bg.size, (255, 255, 255, 0))
+            img = Image.open(os.path.join("assets", filepath)).convert('RGBA')
+            img_clear.paste(img, (0, 0))
+            bg = Image.alpha_composite(bg, img_clear)
 
     # Save the final image into desired location
     if output_filename is not None:
